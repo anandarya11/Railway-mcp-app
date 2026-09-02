@@ -14,7 +14,7 @@ import asyncio
 import streamlit as st
 from anthropic import Anthropic
 from mcp import ClientSession
-from mcp.client.streamable_http import streamablehttp_client
+from mcp.client.streamable_http import streamable_http_client
 
 MCP_URL = "https://railway-mcp.amithv.xyz/mcp"
 MODEL = "claude-sonnet-4-6"
@@ -45,7 +45,7 @@ async def ask_mcp(prompt: str, api_key: str) -> tuple[str, list[str]]:
     client = Anthropic(api_key=api_key)
     tool_log: list[str] = []
 
-    async with streamablehttp_client(MCP_URL) as (read, write, _):
+    async with streamable_http_client(MCP_URL) as (read, write, _):
         async with ClientSession(read, write) as session:
             await session.initialize()
 
