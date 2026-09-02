@@ -14,7 +14,7 @@ import asyncio
 import streamlit as st
 from anthropic import Anthropic
 from mcp import ClientSession
-from mcp.client.streamable_http import streamable_http_client
+from mcp.client.streamable_http import streamablehttp_client
 
 MCP_URL = "https://railway-mcp.amithv.xyz/mcp"
 MODEL = "claude-sonnet-4-6"
@@ -45,7 +45,7 @@ async def ask_mcp(prompt: str, api_key: str) -> tuple[str, list[str]]:
     client = Anthropic(api_key=api_key)
     tool_log: list[str] = []
 
-    async with streamable_http_client(MCP_URL) as (read, write, _):
+    async with streamablehttp_client(MCP_URL) as (read, write, _):
         async with ClientSession(read, write) as session:
             await session.initialize()
 
@@ -105,19 +105,19 @@ if submitted:
             try:
                 answer, tool_log = asyncio.run(ask_mcp(prompt, api_key))
             except Exception as e:
-    st.error(f"Something went wrong: {type(e).__name__}: {e}")
+                st.error(f"Something went wrong: {type(e).__name__}: {e}")
 
-    if isinstance(e, BaseExceptionGroup):
-        st.write("### Detailed error:")
+                if isinstance(e, BaseExceptionGroup):
+                    st.write("### Detailed error:")
 
-        def show_error(exc):
-            if isinstance(exc, BaseExceptionGroup):
-                for sub in exc.exceptions:
-                    show_error(sub)
-            else:
-                st.code(f"{type(exc).__name__}: {exc}")
+                    def show_error(exc):
+                        if isinstance(exc, BaseExceptionGroup):
+                            for sub in exc.exceptions:
+                                show_error(sub)
+                        else:
+                            st.code(f"{type(exc).__name__}: {exc}")
 
-        show_error(e)
+                    show_error(e)
             else:
                 if tool_log:
                     with st.expander("Tool calls (like the Cursor IDE trace)"):
